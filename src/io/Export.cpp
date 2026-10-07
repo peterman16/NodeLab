@@ -19,6 +19,7 @@
 #include "io/Exif.h"
 #include "io/ImageCache.h"
 #include "io/ImageIO.h"
+#include "io/Library.h"
 #include "nodes/ImageOps.h"
 #include "io/Paths.h"
 #include "nodes/io/IONodes.h"
@@ -58,6 +59,10 @@ void ExportSettings::fromJson(const nlohmann::json& j) {
         nameTemplate = t->get<std::string>();
     else if (auto sfx = j.find("suffix"); sfx != j.end() && sfx->is_string())
         nameTemplate = "{name}" + sfx->get<std::string>();
+    // Projects and presets saved the template whatever it was, so the old default "{name}_edit"
+    // is in many that never chose it: they get the source's own name too (an export still never
+    // replaces its source).
+    if (nameTemplate == "{name}_edit") nameTemplate = "{name}";
 }
 
 bool ExportSettings::sameOutput(const ExportSettings& o) const {
@@ -415,22 +420,38 @@ std::string batchOutputPath(const std::string& sourceU8, const std::string& outD
 std::vector<std::string> batchOutputPaths(const std::vector<NameSource>& sources, const std::string& outDirU8,
                                           const ExportSettings& s) {
     std::vector<std::string> out;
-    std::set<std::string> used;  // lower case: Windows names ignore case
+    // Lower case: Windows names ignore case.
+    auto key = [](const fs::path& p) { return lowerAscii(pathToU8(p.lexically_normal())); };
+    std::set<std::string> used, sourceFiles;
+    for (const NameSource& src : sources)
+        if (!src.path.empty()) sourceFiles.insert(key(u8ToPath(src.path)));
+    // Files already in the output folder are previous exports, which a new export replaces,
+    // unless the folder holds the sources: there they are originals (the camera JPEG of a
+    // RAW+JPEG pair), as is a Library photo (one with a sidecar) wherever it is.
+    std::error_code ec;
+    const fs::path outDir = u8ToPath(outDirU8);
+    bool holdsSources = false;
+    for (const NameSource& src : sources)
+        if (!src.path.empty() && !holdsSources) {
+            const fs::path dir = u8ToPath(src.path).parent_path();
+            holdsSources = key(dir) == key(outDir) || fs::equivalent(dir, outDir, ec);
+        }
+    auto taken = [&](const fs::path& p) {
+        if (used.count(key(p)) || sourceFiles.count(key(p))) return true;
+        if (!fs::exists(p, ec)) return false;
+        return holdsSources || fs::exists(u8ToPath(library::sidecarPath(pathToU8(p))), ec);
+    };
     for (size_t i = 0; i < sources.size(); ++i) {
-        std::string p = batchOutputPath(sources[i].path, outDirU8, s, int(i) + 1, sources[i].copy);
-        if (used.count(lowerAscii(p))) {
-            const fs::path base = u8ToPath(p);
+        fs::path p = u8ToPath(batchOutputPath(sources[i].path, outDirU8, s, int(i) + 1, sources[i].copy));
+        if (taken(p)) {
+            const fs::path base = p;
             for (int k = 2;; ++k) {
-                const fs::path alt =
-                    base.parent_path() / u8ToPath(pathToU8(base.stem()) + " (" + std::to_string(k) + ")" + pathToU8(base.extension()));
-                if (!used.count(lowerAscii(pathToU8(alt)))) {
-                    p = pathToU8(alt);
-                    break;
-                }
+                p = base.parent_path() / u8ToPath(pathToU8(base.stem()) + " (" + std::to_string(k) + ")" + pathToU8(base.extension()));
+                if (!taken(p)) break;
             }
         }
-        used.insert(lowerAscii(p));
-        out.push_back(std::move(p));
+        used.insert(key(p));
+        out.push_back(pathToU8(p));
     }
     return out;
 }

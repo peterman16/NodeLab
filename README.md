@@ -53,7 +53,7 @@ See [CHANGELOG.md](CHANGELOG.md).
 Headless render: `NodeLab.exe --render project.nlproj out.png [--depth 16]` (the extension picks
 PNG, JPEG, TIFF or OpenEXR; `--depth 32` for full-float EXR; `--timings` prints evaluate and save times)
 Headless batch: `NodeLab.exe --batch project.nlproj outDir [--png|--jpg|--tif|--exr] [--depth N] a.jpg b.jpg ...`
-(each source goes into the project's first Image Input and is saved as `outDir\<name>_edit.<ext>`)
+(each source goes into the project's first Image Input and is saved as `outDir\<name>.<ext>`)
 Benchmark: `NodeLab.exe --benchmark project.nlproj [--full] [--runs N] [--sync]` (median ms per node)
 GPU compositing: `--device gpu|cpu` and `--precision half|full` for `--render` and `--benchmark`
 (both use the CPU unless given `--device gpu`; `--precision` is full for `--render` and half for
@@ -137,7 +137,7 @@ dark sky, as one group with sliders (see Help > Guide > Recipes).
 | Copy / paste edit | Ctrl+Shift+C copies the open photo's edit, Ctrl+Shift+V pastes it onto the selected photos (each keeps its own file and rating) |
 | Export selected | Library → Export Selected... (or File menu): each selected photo exported with its own edit, using the Export window's format and size |
 | Export | File > Export (Ctrl+E) opens the Export window: renders in the background with a progress bar and Cancel. Format (PNG/TIFF 8 or 16 bit, JPEG + quality with EXIF, OpenEXR half/full float scene-linear), size (original, long edge, percent; Lanczos in linear light) |
-| Batch | Export window → Batch: add files or a folder (or drop them on the window), pick the Image Input they feed and an output folder; each result is named by the File Naming template (`{name}_edit`, with tokens for sequence, capture date, camera, lens...) |
+| Batch | Export window → Batch: add files or a folder (or drop them on the window), pick the Image Input they feed and an output folder; each result is named by the File Naming template (`{name}` by default, with tokens for sequence, capture date, camera, lens...) |
 | Export presets | Export window → Preset: Full-Size JPEG, Web JPEG, Email, PNG, 16-bit TIFF, OpenEXR, or Save... your own |
 | Snapshots | View > Snapshots: Create Snapshot keeps the whole edit (saved with the project); click one to restore it |
 

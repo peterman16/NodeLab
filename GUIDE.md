@@ -1216,8 +1216,11 @@ progress, and **Cancel** stops it.
   to 001), `{copy}` "Copy 1" for a virtual copy, `{date}` the capture date (YYYY-MM-DD) with
   `{year}` `{month}` `{day}` `{time}` and the others, `{today}` the export date, and `{camera}`,
   `{lens}`, `{iso}`, `{focal}`, `{aperture}` and `{shutter}` from the EXIF. The default is
-  `{name}_edit`. Two photos that would get the same name get " (2)", " (3)" added, so no export
-  overwrites another, and an export never overwrites its source.
+  `{name}`, the source's own name. A name that is taken gets " (2)", " (3)" added: two photos
+  that would get the same name, or a file already there that isn't an earlier export. In a folder
+  that holds the sources every existing file counts as taken (so a RAW's export never replaces the
+  camera's JPEG of the same name); elsewhere only Library photos do, and earlier exports are
+  replaced. An export into its source's folder in the same format is named `<name>_edit`.
 - **Format:**
   - **PNG** and **TIFF** (8 or 16 bit) and **JPEG** (with a quality setting) are display images:
     the view transform is applied, as in the viewer, and they are tagged sRGB (PNG's sRGB chunk,

@@ -192,7 +192,7 @@ static int benchmarkHeadless(const std::string& project, bool full, int runs, bo
 
 // NodeLab.exe --batch project.nlproj outDir [--png|--jpg|--tif|--exr] [--depth N] in1 in2 ... : runs
 // each source image through the project (fed into its first Image Input) and writes
-// outDir/<name>_edit.<ext>, or as the project's filename template names it. Unset options come
+// outDir/<name>.<ext>, or as the project's filename template names it. Unset options come
 // from the project's Export settings.
 static int batchHeadless(const std::string& project, const std::string& outDir, std::vector<std::string> args) {
     Graph g;

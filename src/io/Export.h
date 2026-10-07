@@ -32,7 +32,7 @@ struct ExportSettings {
     int sharpenAmount = 1;  // 0 Low, 1 Standard, 2 High
     bool fileOutputs = true;  // also write File Output nodes (single export only)
     // Batch naming (Lightroom's File Naming): a filename template, see expandNameTemplate.
-    std::string nameTemplate = "{name}_edit";
+    std::string nameTemplate = "{name}";
 
     const char* extension() const { return formatExtension(FileFormat(format)); }
     // The same file format, size, sharpening and naming (a preset's settings; fileOutputs and
@@ -100,8 +100,9 @@ extern const int kNameTokenCount;
 // Output path for one batch source: outDir/<template>.<ext>. Never returns the source itself.
 std::string batchOutputPath(const std::string& sourceU8, const std::string& outDirU8, const ExportSettings& s,
                             int sequence = 1, int copy = 0);
-// Output paths for a whole batch, numbered in order; a name the template gives twice gets
-// " (2)", " (3)"... so no export in the batch overwrites another.
+// Output paths for a whole batch, numbered in order. A name that is taken gets " (2)", " (3)"...:
+// one the template gives twice, a source, or an existing file that isn't a previous export (any
+// file when the output folder holds sources, else a Library photo). Previous exports are replaced.
 std::vector<std::string> batchOutputPaths(const std::vector<NameSource>& sources, const std::string& outDirU8,
                                           const ExportSettings& s);
 

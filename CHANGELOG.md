@@ -12,6 +12,17 @@ features and patch versions fix bugs. Each release is tagged `vX.Y.Z` in git.
   Blackbody's Temperature shows the colour at each temperature. In the Inspector and on nodes.
 - **Segoe UI Variable** (Windows 11's interface font) replaces Segoe UI where it's installed.
 
+### Changed
+- **Exports keep the photo's name**: the File Naming template defaults to `{name}` instead of
+  `{name}_edit` (projects and presets that kept the old default switch too), and a single
+  export suggests the source photo's name.
+
+### Fixed
+- **Batch export no longer replaces originals**: an export whose name is taken by a file in a
+  source's folder (such as the camera JPEG beside a RAW), by another source in the batch, or by
+  a Library photo gets " (2)" added. Earlier exports in a separate output folder are still
+  replaced.
+
 ## 1.2.0 (2026-10-05)
 
 ### New

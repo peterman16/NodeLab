@@ -106,6 +106,40 @@ TEST_CASE("batchOutputPath never overwrites the source") {
     fs::remove_all(dir);
 }
 
+TEST_CASE("Batch exports keep the source's name but never replace an original") {
+    ExportSettings s;
+    CHECK(s.nameTemplate == "{name}");
+    // The old default, saved in older projects and presets, means the new one.
+    ExportSettings old;
+    old.fromJson({{"nameTemplate", "{name}_edit"}});
+    CHECK(old.nameTemplate == "{name}");
+
+    const fs::path dir = fs::temp_directory_path() / "nodelab_batch_collide";
+    fs::remove_all(dir);
+    fs::create_directories(dir / "out");
+    // A RAW+JPEG pair: exporting the "RAW" (a.png here) as JPEG into its own folder must not
+    // replace the camera's a.jpg, which isn't in the batch.
+    const std::string raw = writeSource(dir, "a.png", 0.5f);
+    std::ofstream(dir / "a.jpg") << "camera";
+    s.format = ExportSettings::JPEG;
+    auto outs = batchOutputPaths({{raw}}, pathToU8(dir), s);
+    CHECK(u8ToPath(outs[0]).filename() == "a (2).jpg");
+    // Both of the pair in one batch: neither export replaces the other's source.
+    const std::string jpg = pathToU8(dir / "a.jpg");
+    outs = batchOutputPaths({{raw}, {jpg}}, pathToU8(dir), s);
+    CHECK(u8ToPath(outs[0]).filename() == "a (2).jpg");
+    CHECK(u8ToPath(outs[1]).filename() == "a_edit.jpg");
+
+    // In a separate folder an earlier export is replaced, but a Library photo isn't.
+    std::ofstream(dir / "out" / "a.jpg") << "earlier export";
+    outs = batchOutputPaths({{raw}}, pathToU8(dir / "out"), s);
+    CHECK(u8ToPath(outs[0]).filename() == "a.jpg");
+    std::ofstream(dir / "out" / "a.jpg.nlproj") << "{}";
+    outs = batchOutputPaths({{raw}}, pathToU8(dir / "out"), s);
+    CHECK(u8ToPath(outs[0]).filename() == "a (2).jpg");
+    fs::remove_all(dir);
+}
+
 TEST_CASE("Exporter runs a batch through the graph on a background thread") {
     const fs::path dir = fs::temp_directory_path() / "nodelab_batch_run";
     fs::remove_all(dir);
@@ -120,7 +154,7 @@ TEST_CASE("Exporter runs a batch through the graph on a background thread") {
     g.connect(in->id, 0, inv->id, 0);
     g.connect(inv->id, 0, out->id, 0);
 
-    ExportSettings s;  // PNG, "_edit"
+    ExportSettings s;  // PNG, "{name}"
     std::vector<ExportItem> items;
     for (const std::string& src : {a, b, pathToU8(dir / "missing.png")})
         items.push_back({src, batchOutputPath(src, pathToU8(dir / "out"), s)});
@@ -134,8 +168,8 @@ TEST_CASE("Exporter runs a batch through the graph on a background thread") {
     CHECK(ex.takeLog().size() == 3);
 
     std::string err;
-    auto ra = loadImage(pathToU8(dir / "out" / "a_edit.png"), err);
-    auto rb = loadImage(pathToU8(dir / "out" / "b_edit.png"), err);
+    auto ra = loadImage(pathToU8(dir / "out" / "a.png"), err);
+    auto rb = loadImage(pathToU8(dir / "out" / "b.png"), err);
     REQUIRE(ra);
     REQUIRE(rb);
     // Each result has its own source's size, and was inverted.

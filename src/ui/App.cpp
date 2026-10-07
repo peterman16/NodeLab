@@ -2075,10 +2075,22 @@ void App::importImage(const std::string& path) {
 void App::openExportWindow() {
     showExport_ = true;
     focusExport_ = true;
-    // Suggest a file next to the project the first time.
+    // Suggest a file the first time: named after the source photo, as batches are, next to the
+    // project (a Library photo's sidecar sits next to the photo). Batch naming keeps it from
+    // replacing the photo or another original.
     if (!exportPath_[0]) {
-        auto base = projectPath_.empty() ? std::filesystem::path("export") : u8ToPath(projectPath_).replace_extension();
-        std::snprintf(exportPath_, sizeof(exportPath_), "%s", pathToU8(base.string() + std::string(exportSettings_.extension())).c_str());
+        const std::string source = metadataSource(graph_);
+        std::string path;
+        if (!source.empty()) {
+            const auto dir = projectPath_.empty() ? u8ToPath(source).parent_path() : u8ToPath(projectPath_).parent_path();
+            ExportSettings s = exportSettings_;
+            s.nameTemplate = "{name}";
+            path = batchOutputPaths({{source}}, pathToU8(dir), s).front();
+        } else {
+            auto base = projectPath_.empty() ? std::filesystem::path("export") : u8ToPath(projectPath_).replace_extension();
+            path = pathToU8(base) + exportSettings_.extension();
+        }
+        std::snprintf(exportPath_, sizeof(exportPath_), "%s", path.c_str());
     }
 }
 

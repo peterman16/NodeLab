@@ -242,7 +242,7 @@ private:
     int exportTab_ = 0;  // tab shown last frame: 0 single, 1 batch (drops go to batch sources)
     char exportPath_[1024] = {};
     char batchDir_[1024] = {};
-    char nameTemplate_[256] = "{name}_edit";  // exportSettings_.nameTemplate while it's edited
+    char nameTemplate_[256] = "{name}";  // exportSettings_.nameTemplate while it's edited
     std::vector<ExportPreset> exportPresets_;  // the user's (preferences.json)
     char presetName_[64] = {};
     int removeCopyIndex_ = -1;  // the library entry the Remove Virtual Copy dialog asks about
