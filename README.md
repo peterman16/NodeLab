@@ -207,6 +207,7 @@ Adding a node: write a class with a `NODELAB_NODE({...})` descriptor and `evalua
 
 NodeLab is released under the [MIT License](LICENSE). The release exe statically links GLFW (zlib),
 Dear ImGui (MIT), nlohmann/json (MIT), stb (public domain / MIT), tinyexpr (zlib), zlib-ng (zlib)
-and LibRaw (LGPL 2.1 / CDDL 1.0, used under CDDL). The AI masks download ONNX Runtime and DirectML
+and LibRaw (LGPL 2.1 / CDDL 1.0, used under CDDL), and embeds the Inter font (SIL Open Font
+License 1.1, `third_party/inter`). The AI masks download ONNX Runtime and DirectML
 (MIT) and their models (BiRefNet and U²-Net sky segmentation, MIT) on first use; they aren't
 part of the exe. `third_party/onnxruntime` has ONNX Runtime's C API headers (MIT).

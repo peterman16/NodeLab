@@ -221,6 +221,19 @@ add_custom_command(OUTPUT ${NODELAB_GUIDE_CPP}
     DEPENDS ${CMAKE_SOURCE_DIR}/GUIDE.md ${CMAKE_SOURCE_DIR}/cmake/EmbedText.cmake
     COMMENT "Embedding GUIDE.md")
 
+# The UI font, Inter (Blender's since 4.0; SIL OFL, third_party/inter), is compiled in too, so the
+# interface looks the same on every PC.
+set(NODELAB_FONT_CPPS)
+foreach(_face Regular Bold)
+    set(_cpp ${CMAKE_BINARY_DIR}/generated/Inter${_face}.cpp)
+    add_custom_command(OUTPUT ${_cpp}
+        COMMAND ${CMAKE_COMMAND} -DIN=${CMAKE_SOURCE_DIR}/third_party/inter/Inter-${_face}.ttf -DOUT=${_cpp}
+            -DNAME=kInter${_face} -P ${CMAKE_SOURCE_DIR}/cmake/EmbedText.cmake
+        DEPENDS ${CMAKE_SOURCE_DIR}/third_party/inter/Inter-${_face}.ttf ${CMAKE_SOURCE_DIR}/cmake/EmbedText.cmake
+        COMMENT "Embedding Inter-${_face}.ttf")
+    list(APPEND NODELAB_FONT_CPPS ${_cpp})
+endforeach()
+
 # Windows can't overwrite a running exe but can rename it; move the old one aside before linking
 # so a single build/ folder works while NodeLab is open.
 function(nodelab_allow_relink target)
@@ -313,7 +326,8 @@ add_executable(NodeLab
     src/ui/ParamWidgets.cpp
     src/ui/SliderTrack.cpp
     src/ui/ViewerOverlay.cpp
-    src/ui/NodeInspectors.cpp)
+    src/ui/NodeInspectors.cpp
+    ${NODELAB_FONT_CPPS})
 target_link_libraries(NodeLab PRIVATE nodelab_core imgui)
 nodelab_allow_relink(NodeLab)
 if(WIN32)
