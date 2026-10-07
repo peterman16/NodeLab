@@ -10,6 +10,7 @@ features and patch versions fix bugs. Each release is tagged `vX.Y.Z` in git.
   (Basic), Hue sliders show the spectrum (Color Grading, Color Key, HSL Mask, Hue Shift), Color
   Mixer's Hue, Saturation and Luminance sliders show their band's colour changing, and
   Blackbody's Temperature shows the colour at each temperature. In the Inspector and on nodes.
+- **Segoe UI Variable** (Windows 11's interface font) replaces Segoe UI where it's installed.
 
 ## 1.2.0 (2026-10-05)
 

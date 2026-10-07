@@ -253,7 +253,11 @@ int App::run(const RunOptions& opt) {
     style.TabRounding = 3.0f;
     style.ScaleAllSizes(dpi);
 
-    const char* uiFont = "C:/Windows/Fonts/segoeui.ttf";
+    // Segoe UI Variable (Windows 11's UI font), or Segoe UI where it's missing (Windows 10). It's
+    // a variable font and ImGui's rasterizer reads only its default instance, Text Regular, which
+    // is the one Windows uses for UI text.
+    const char* uiFont = "C:/Windows/Fonts/SegUIVar.ttf";
+    if (!fs::exists(uiFont)) uiFont = "C:/Windows/Fonts/segoeui.ttf";
     if (fs::exists(uiFont)) io.Fonts->AddFontFromFileTTF(uiFont, 17.0f * dpi);
     else io.FontGlobalScale = dpi;
     // Extra faces for the guide: bold, headings and code. Glyphs cover the guide's own text.
