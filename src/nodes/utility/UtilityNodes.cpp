@@ -86,7 +86,7 @@ public:
     NODELAB_NODE({"conv.blackbody", "Blackbody", "Converter",
                   {{"Temperature", PinType::Channel, 0}},
                   {{"Color", PinType::Image}},
-                  {ParamDesc::Float("Temperature", 3200.0f, 800.0f, 12000.0f)}})
+                  {ParamDesc::Float("Temperature", 3200.0f, 800.0f, 12000.0f).withTrack(SliderTrack::Kelvin)}})
     void evaluate(EvalContext& ctx, const std::vector<Value>& in, std::vector<Value>& out) override {
         // Table over log(temperature) from 800 K to 40000 K.
         static const std::vector<std::array<float, 3>> lut = [] {

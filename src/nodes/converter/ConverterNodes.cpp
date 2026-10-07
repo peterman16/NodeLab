@@ -145,7 +145,7 @@ public:
     NODELAB_NODE({"conv.color_key", "Color Key", "Converter",
                   {{"Image", PinType::Image}},
                   {{"Mask", PinType::Channel}, {"Image", PinType::Image}},
-                  {ParamDesc::Float("Hue", 120.0f, 0.0f, 360.0f), ParamDesc::Float("Hue Range", 30.0f, 0.0f, 180.0f),
+                  {ParamDesc::Float("Hue", 120.0f, 0.0f, 360.0f).withTrack(SliderTrack::Hue), ParamDesc::Float("Hue Range", 30.0f, 0.0f, 180.0f),
                    ParamDesc::Float("Sat Min", 0.15f, 0.0f, 1.0f), ParamDesc::Float("Sat Max", 1.0f, 0.0f, 1.0f),
                    ParamDesc::Float("Value Min", 0.05f, 0.0f, 1.0f), ParamDesc::Float("Value Max", 1.0f, 0.0f, 1.0f),
                    ParamDesc::Float("Softness", 0.1f, 0.0f, 0.5f), ParamDesc::Bool("Invert", false)}})

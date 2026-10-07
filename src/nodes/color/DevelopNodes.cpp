@@ -357,7 +357,8 @@ public:
                   {{"Image", PinType::Image}, {"Factor", PinType::Channel, 0}},
                   {{"Image", PinType::Image}},
                   {ParamDesc::Float("Factor", 1.0f, 0.0f, 1.0f),
-                   ParamDesc::Float("Temperature", 0.0f, -100.0f, 100.0f), ParamDesc::Float("Tint", 0.0f, -100.0f, 100.0f),
+                   ParamDesc::Float("Temperature", 0.0f, -100.0f, 100.0f).withTrack(SliderTrack::Temperature),
+                   ParamDesc::Float("Tint", 0.0f, -100.0f, 100.0f).withTrack(SliderTrack::Tint),
                    ParamDesc::Float("Exposure", 0.0f, -5.0f, 5.0f), ParamDesc::Float("Contrast", 0.0f, -100.0f, 100.0f),
                    ParamDesc::Float("Highlights", 0.0f, -100.0f, 100.0f), ParamDesc::Float("Shadows", 0.0f, -100.0f, 100.0f),
                    ParamDesc::Float("Whites", 0.0f, -100.0f, 100.0f), ParamDesc::Float("Blacks", 0.0f, -100.0f, 100.0f),
@@ -990,8 +991,14 @@ float hueGap(const float* centre, int from, int to) {
 
 std::vector<ParamDesc> mixerParams() {
     std::vector<ParamDesc> p{ParamDesc::Float("Factor", 1.0f, 0.0f, 1.0f)};
-    for (const char* what : {"Hue", "Saturation", "Luminance"})
-        for (const char* band : kBandNames) p.push_back(ParamDesc::Float(std::string(band) + " " + what, 0.0f, -100.0f, 100.0f));
+    // Each slider's track shows its band's colour changing: Hue moves it by up to 30 degrees
+    // either way (as evaluate does), Saturation and Luminance fade it.
+    const SliderTrack tracks[3] = {SliderTrack::HueShift, SliderTrack::Saturation, SliderTrack::Luminance};
+    const char* const what[3] = {"Hue", "Saturation", "Luminance"};
+    for (int k = 0; k < 3; ++k)
+        for (int b = 0; b < 8; ++b)
+            p.push_back(ParamDesc::Float(std::string(kBandNames[b]) + " " + what[k], 0.0f, -100.0f, 100.0f)
+                            .withTrack(tracks[k], kBandHue[b], 30.0f));
     return p;
 }
 
@@ -1164,13 +1171,13 @@ public:
                   {{"Image", PinType::Image}, {"Factor", PinType::Channel, 0}},
                   {{"Image", PinType::Image}},
                   {ParamDesc::Float("Factor", 1.0f, 0.0f, 1.0f),
-                   ParamDesc::Float("Shadows Hue", 220.0f, 0.0f, 360.0f), ParamDesc::Float("Shadows Saturation", 0.0f, 0.0f, 100.0f),
+                   ParamDesc::Float("Shadows Hue", 220.0f, 0.0f, 360.0f).withTrack(SliderTrack::Hue), ParamDesc::Float("Shadows Saturation", 0.0f, 0.0f, 100.0f),
                    ParamDesc::Float("Shadows Luminance", 0.0f, -100.0f, 100.0f),
-                   ParamDesc::Float("Midtones Hue", 40.0f, 0.0f, 360.0f), ParamDesc::Float("Midtones Saturation", 0.0f, 0.0f, 100.0f),
+                   ParamDesc::Float("Midtones Hue", 40.0f, 0.0f, 360.0f).withTrack(SliderTrack::Hue), ParamDesc::Float("Midtones Saturation", 0.0f, 0.0f, 100.0f),
                    ParamDesc::Float("Midtones Luminance", 0.0f, -100.0f, 100.0f),
-                   ParamDesc::Float("Highlights Hue", 45.0f, 0.0f, 360.0f), ParamDesc::Float("Highlights Saturation", 0.0f, 0.0f, 100.0f),
+                   ParamDesc::Float("Highlights Hue", 45.0f, 0.0f, 360.0f).withTrack(SliderTrack::Hue), ParamDesc::Float("Highlights Saturation", 0.0f, 0.0f, 100.0f),
                    ParamDesc::Float("Highlights Luminance", 0.0f, -100.0f, 100.0f),
-                   ParamDesc::Float("Global Hue", 0.0f, 0.0f, 360.0f), ParamDesc::Float("Global Saturation", 0.0f, 0.0f, 100.0f),
+                   ParamDesc::Float("Global Hue", 0.0f, 0.0f, 360.0f).withTrack(SliderTrack::Hue), ParamDesc::Float("Global Saturation", 0.0f, 0.0f, 100.0f),
                    ParamDesc::Float("Global Luminance", 0.0f, -100.0f, 100.0f),
                    ParamDesc::Float("Blending", 50.0f, 0.0f, 100.0f), ParamDesc::Float("Balance", 0.0f, -100.0f, 100.0f)},
                   false, true})

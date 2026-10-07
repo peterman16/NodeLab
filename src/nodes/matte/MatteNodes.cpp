@@ -640,7 +640,7 @@ public:
     NODELAB_NODE({"matte.hsl_mask", "HSL Mask", "Matte",
                   {{"Image", PinType::Image}, {"Mask", PinType::Channel}},
                   {{"Mask", PinType::Channel}},
-                  {ParamDesc::Bool("Use Hue", true), ParamDesc::Float("Hue", 0.0f, 0.0f, 360.0f).when(UseHue),
+                  {ParamDesc::Bool("Use Hue", true), ParamDesc::Float("Hue", 0.0f, 0.0f, 360.0f).withTrack(SliderTrack::Hue).when(UseHue),
                    ParamDesc::Float("Hue Width", 60.0f, 0.0f, 360.0f).when(UseHue),
                    ParamDesc::Float("Hue Softness", 20.0f, 0.0f, 180.0f).when(UseHue),
                    ParamDesc::Bool("Use Saturation", true), ParamDesc::Float("Saturation Low", 0.15f, 0.0f, 1.0f).when(UseSat),

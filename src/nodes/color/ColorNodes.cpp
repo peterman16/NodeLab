@@ -315,7 +315,7 @@ public:
     NODELAB_NODE({"color.hue_shift", "Hue Shift", "Color",
                   {{"Image", PinType::Image}, {"Degrees", PinType::Channel, 0}},
                   {{"Image", PinType::Image}},
-                  {ParamDesc::Float("Degrees", 0.0f, -180.0f, 180.0f)}})
+                  {ParamDesc::Float("Degrees", 0.0f, -180.0f, 180.0f).withTrack(SliderTrack::HueShift, 0.0f, 180.0f)}})
     void evaluate(EvalContext& ctx, const std::vector<Value>& in, std::vector<Value>& out) override {
         const bool lin = ctx.linear();
         ImagePtr src = toImage(in[0], 0, 0);

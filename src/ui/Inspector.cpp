@@ -16,6 +16,8 @@
 #include "ui/GuideWindow.h"
 #include "ui/NodeInspectors.h"
 #include "ui/ParamWidgets.h"
+#include "ui/SliderTrack.h"
+#include "ui/Theme.h"
 
 
 namespace {
@@ -84,6 +86,20 @@ bool editParam(Node& node, int i, float width, bool compact) {
             float v = node.paramF(i);
             beginNumberField(label.c_str());
             const bool drag = compact || d.hardMax > d.max || d.hardMin < d.min;
+            const bool track = d.track != SliderTrack::None;
+            if (track) {
+                // The coloured track goes under a see-through frame; hover and drag still lighten it.
+                const ImVec2 p = ImGui::GetCursorScreenPos();
+                slidertrack::draw(ImGui::GetWindowDrawList(), p, ImVec2(p.x + ImGui::CalcItemWidth(), p.y + ImGui::GetFrameHeight()),
+                                  d, theme::col(theme::Field), ImGui::GetStyle().FrameRounding);
+                ImGui::PushStyleColor(ImGuiCol_FrameBg, IM_COL32(0, 0, 0, 0));
+                ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, IM_COL32(255, 255, 255, 22));
+                ImGui::PushStyleColor(ImGuiCol_FrameBgActive, IM_COL32(255, 255, 255, 34));
+                ImGui::PushStyleColor(ImGuiCol_SliderGrab, IM_COL32(235, 235, 235, 230));
+                ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, IM_COL32(255, 255, 255, 255));
+                // A thin grab, so the value text centred over it stays readable at 0.
+                ImGui::PushStyleVar(ImGuiStyleVar_GrabMinSize, 4.0f);
+            }
             if (drag) {
                 // Unbounded (math) values: drag field whose speed follows the soft range.
                 changed = ImGui::DragFloat(label.c_str(), &v, (d.max - d.min) / 300.0f, d.hardMin, d.hardMax, "%.3f",
@@ -91,6 +107,10 @@ bool editParam(Node& node, int i, float width, bool compact) {
             } else {
                 changed = ImGui::SliderFloat(label.c_str(), &v, d.min, d.max, d.max - d.min >= 20.0f ? "%.1f" : "%.3f",
                                              ImGuiSliderFlags_AlwaysClamp);
+            }
+            if (track) {
+                ImGui::PopStyleColor(5);
+                ImGui::PopStyleVar();
             }
             if (changed) node.params[i] = v;
             changed |= endNumberField(node, i, before, !drag);

@@ -21,6 +21,19 @@ struct PinDesc {
 
 enum class ParamKind { Float, Int, Bool, Enum, Path, Text, Curve, Ramp, Color, SavePath };
 
+// What a Float slider's track shows, like Lightroom's coloured sliders: the colours the value
+// gives along its range (ui/SliderTrack.cpp draws them).
+enum class SliderTrack {
+    None,
+    Temperature,  // cool blue to warm yellow
+    Tint,         // green to magenta
+    Kelvin,       // the black-body colour at each temperature
+    Hue,          // the hue in degrees (0..360)
+    HueShift,     // trackHue moved by up to +-trackSpan degrees across the range
+    Saturation,   // trackHue from grey to vivid
+    Luminance,    // trackHue from dark to bright
+};
+
 struct ParamDesc {
     std::string name;
     ParamKind kind = ParamKind::Float;
@@ -33,11 +46,20 @@ struct ParamDesc {
     int showIf = -1;
     int showIfValue = 1;
     bool gammaColor = false;  // Color kind: see ColorGamma()
+    SliderTrack track = SliderTrack::None;
+    float trackHue = 0.0f, trackSpan = 0.0f;  // degrees, for the band tracks
 
     ParamDesc when(int param, int value = 1) const {
         ParamDesc d = *this;
         d.showIf = param;
         d.showIfValue = value;
+        return d;
+    }
+    ParamDesc withTrack(SliderTrack t, float hue = 0.0f, float span = 0.0f) const {
+        ParamDesc d = *this;
+        d.track = t;
+        d.trackHue = hue;
+        d.trackSpan = span;
         return d;
     }
 

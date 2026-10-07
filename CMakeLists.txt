@@ -311,6 +311,7 @@ add_executable(NodeLab
     src/ui/FileDialog.cpp
     src/ui/UiScript.cpp
     src/ui/ParamWidgets.cpp
+    src/ui/SliderTrack.cpp
     src/ui/ViewerOverlay.cpp
     src/ui/NodeInspectors.cpp)
 target_link_libraries(NodeLab PRIVATE nodelab_core imgui)
