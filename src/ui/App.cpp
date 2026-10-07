@@ -52,12 +52,6 @@ static const char* kProjectFilter = "NodeLab project (*.nlproj)|*.nlproj|All fil
 static bool isImageFile(const std::filesystem::path& p) { return isImageFile(pathToU8(p)); }
 static const char* kDockName = "NodeLabDockSpace";
 
-// Inter's TTFs, embedded by cmake/EmbedText.cmake (generated/Inter*.cpp).
-extern const char* const kInterRegular;
-extern const std::size_t kInterRegularSize;
-extern const char* const kInterBold;
-extern const std::size_t kInterBoldSize;
-
 void dropCallback(GLFWwindow* w, int count, const char** paths) {
     auto* app = static_cast<App*>(glfwGetWindowUserPointer(w));
     for (int i = 0; i < count; ++i) app->drops_.emplace_back(paths[i]);
@@ -257,20 +251,11 @@ int App::run(const RunOptions& opt) {
     style.WindowRounding = 0.0f;
     style.FrameRounding = 3.0f;
     style.TabRounding = 3.0f;
-    // Inter at 15 px looks as big as Segoe UI did at 17 (its letters fill more of the line); the
-    // extra padding keeps buttons and sliders as tall as before (15 + 2 * 4 = 17 + 2 * 3 px), so layouts and the UI scripts'
-    // coordinates hold.
-    style.FramePadding.y += 1.0f;
     style.ScaleAllSizes(dpi);
 
-    // Inter, compiled in (Blender's UI font). The atlas only reads the static arrays, so it must
-    // not try to free them.
-    ImFontConfig embedded;
-    embedded.FontDataOwnedByAtlas = false;
-    auto inter = [&](const char* data, std::size_t size, float px, const ImWchar* glyphs) {
-        return io.Fonts->AddFontFromMemoryTTF(const_cast<char*>(data), int(size), px * dpi, &embedded, glyphs);
-    };
-    inter(kInterRegular, kInterRegularSize, 15.0f, nullptr);
+    const char* uiFont = "C:/Windows/Fonts/segoeui.ttf";
+    if (fs::exists(uiFont)) io.Fonts->AddFontFromFileTTF(uiFont, 17.0f * dpi);
+    else io.FontGlobalScale = dpi;
     // Extra faces for the guide: bold, headings and code. Glyphs cover the guide's own text.
     {
         static ImVector<ImWchar> ranges;
@@ -283,10 +268,10 @@ int App::run(const RunOptions& opt) {
             return fs::exists(file) ? io.Fonts->AddFontFromFileTTF(file, size * dpi, nullptr, ranges.Data) : nullptr;
         };
         GuideFonts gf;
-        gf.bold = inter(kInterBold, kInterBoldSize, 15.0f, ranges.Data);
-        gf.h1 = inter(kInterBold, kInterBoldSize, 27.0f, ranges.Data);
-        gf.h2 = inter(kInterBold, kInterBoldSize, 21.0f, ranges.Data);
-        gf.h3 = inter(kInterBold, kInterBoldSize, 18.0f, ranges.Data);
+        gf.bold = load("C:/Windows/Fonts/segoeuib.ttf", 17.0f);
+        gf.h1 = load("C:/Windows/Fonts/segoeuib.ttf", 30.0f);
+        gf.h2 = load("C:/Windows/Fonts/segoeuib.ttf", 24.0f);
+        gf.h3 = load("C:/Windows/Fonts/segoeuib.ttf", 20.0f);
         gf.code = load("C:/Windows/Fonts/consola.ttf", 16.0f);
         setGuideFonts(gf);
     }

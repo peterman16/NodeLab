@@ -10,8 +10,6 @@ features and patch versions fix bugs. Each release is tagged `vX.Y.Z` in git.
   (Basic), Hue sliders show the spectrum (Color Grading, Color Key, HSL Mask, Hue Shift), Color
   Mixer's Hue, Saturation and Luminance sliders show their band's colour changing, and
   Blackbody's Temperature shows the colour at each temperature. In the Inspector and on nodes.
-- **Inter** is the interface font (Blender's since 4.0), built into the exe so NodeLab looks the
-  same on every PC. It replaces Segoe UI at the same visual size and row heights.
 
 ## 1.2.0 (2026-10-05)
 
